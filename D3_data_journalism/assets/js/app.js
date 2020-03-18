@@ -3,7 +3,7 @@ var svgWidth = 960;
 var svgHeight = 600;
 
 var axisDelay = 100;
-var circleDely = 100;
+var circleDely = 10000;
 
 //set the margin
 var margin = {
