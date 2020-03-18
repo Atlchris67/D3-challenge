@@ -93,7 +93,7 @@ function handleClick(label, activeInfo) {
     }
 
     updateLabel(label, axis)
-
+    createToolTip(activeInfo)
     if (axis === "x") {
         activeInfo.currentX = name;
         activeInfo.xScale.domain(getXDomain(activeInfo))
@@ -106,6 +106,8 @@ function handleClick(label, activeInfo) {
         renderYAxes(activeInfo)
         renderVertical(activeInfo)
     }
+
+    createToolTip(activeInfo)
 }
 
 function createLabels() {
@@ -183,7 +185,7 @@ function createCircles(activeInfo) {
         .attr("r", 10)
         .attr("fill", "blue")
         .attr("opacity", ".5")
-    
+
     chartGroup.selectAll(null)
         .data(activeInfo.data)
         .enter()
@@ -192,8 +194,8 @@ function createCircles(activeInfo) {
         .attr("x", d => xScale(d[currentX]))
         .attr("y", d => yScale(d[currentY]))
         .attr("class", "text-circle")
-        .attr("font-size","10px")
-        .attr("text-anchor","middle")
+        .attr("font-size", "10px")
+        .attr("text-anchor", "middle")
         .attr("fill", "white");
 }
 
@@ -210,13 +212,12 @@ function createAxis(activeInfo) {
         .attr("transform", `translate(0, ${chartHeight})`)
 }
 
-/********************************************/
 function renderXAxes(activeInfo) {
     chartGroup.select(".x-axis").transition()
         .duration(axisDelay)
         .call(activeInfo.xAxis);
 }
-/********************************************/
+
 function renderYAxes(activeInfo) {
     chartGroup.select(".y-axis").transition()
         .duration(axisDelay)
@@ -240,19 +241,19 @@ function renderHorizontal(activeInfo) {
 
     d3.selectAll("circle")
         .each(function () {
-        d3.select(this)
-            .transition()
-            .attr("cx", d => activeInfo.xScale(d[activeInfo.currentX]))
-            .duration(circleDely)
-    })
+            d3.select(this)
+                .transition()
+                .attr("cx", d => activeInfo.xScale(d[activeInfo.currentX]))
+                .duration(circleDely)
+        })
 
     d3.selectAll(".text-circle")
-    .each(function () {
-        d3.select(this)
-            .transition()
-            .attr("x", d => activeInfo.xScale(d[activeInfo.currentX]))
-            .duration(circleDely)
-    })    
+        .each(function () {
+            d3.select(this)
+                .transition()
+                .attr("x", d => activeInfo.xScale(d[activeInfo.currentX]))
+                .duration(circleDely)
+        })
 }
 
 /********************************************/
@@ -271,9 +272,9 @@ function renderVertical(activeInfo) {
                 .transition()
                 .attr("y", d => activeInfo.yScale(d[activeInfo.currentY]))
                 .duration(circleDely)
-        })    
-}
+        })
 
+}
 
 function updateLabel(label, axis) {
 
@@ -286,38 +287,43 @@ function updateLabel(label, axis) {
     label.classed("inactive", false).classed("active", true)
 }
 
-
 function createToolTip(activeInfo) {
-    var label;
+    var xlabel;
+    var ylabel;
 
     if (activeInfo.currentX === "poverty") {
-        label = "Poverty:";
+        xlabel = "% in Poverty: ";
     } else if (activeInfo.currentX === "age") {
-        label = "Age:";
+        xlabel = "Median Age: ";
     } else {
-        label = "Income:";
+        xlabel = "Median Income: ";
+    }
+
+    if (activeInfo.currentY === "healthcare") {
+        ylabel = "% Lacks Healthcare: ";
+    } else if (activeInfo.currentY === "obesity") {
+        ylabel = "% Obese: ";
+    } else {
+        ylabel = "% Smokers: ";
     }
 
     var toolTip = d3.tip()
-        .attr("class", "tooltip")
-        .offset([80, -60])
+        .attr("class", "tooltip d3-tip")
+        .offset([-8, 0])
         .html(function (d) {
-            var html = "<br> " + label +
-                d[activeInfo.currentX] +
-                "<br> Number: " +
-                d[activeInfo.currentY]
+            var html = xlabel +
+                d[activeInfo.currentX] + 
+                "<br>" + ylabel +
+                d[activeInfo.currentX] ;
+
             return html;
         });
 
     chartGroup.call(toolTip);
 
-    var circles = d3.selectAll("circle");
-
-    circles.on("mouseover", function (data) {
-        toolTip.show(data);
-    })
-
-    circles.on("mouseout", function (data, index) {
+    d3.selectAll("circle").on("mouseover", function (data) {
+        toolTip.show(data)
+    }).on("mouseout", function (data, index) {
         toolTip.hide(data);
     });
 }
