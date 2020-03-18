@@ -314,7 +314,7 @@ function createToolTip(activeInfo) {
             var html = xlabel +
                 d[activeInfo.currentX] + 
                 "<br>" + ylabel +
-                d[activeInfo.currentX] ;
+                d[activeInfo.currentY] ;
 
             return html;
         });
